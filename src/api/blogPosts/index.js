@@ -16,6 +16,7 @@ import { blogPostsJSONPath } from "../lib/fs-tools.js";
 import BlogPostsModel from "./model.js";
 import { userInfo } from "os";
 import createHttpError from "http-errors";
+import basicAuthentication from "../lib/auth/basicAuth.js";
 
 const { NotFound, Unauthorized, BadRequest } = httpErrors;
 const blogPostsRouter = express.Router();
@@ -51,7 +52,7 @@ blogPostsRouter.get("/", async (req, res, next) => {
   res.status(201).send({ _id: newBlogPost._id });
 }); */
 
-blogPostsRouter.post("/", async (req, res, next) => {
+blogPostsRouter.post("/", basicAuthentication, async (req, res, next) => {
   try {
     const newBlogPost = new BlogPostsModel(req.body);
     await newBlogPost.save();
@@ -119,25 +120,29 @@ blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   res.send(updatedBlogPost);
 }); */
 
-blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
-  try {
-    const updatedBlogPost = await BlogPostsModel.findByIdAndUpdate(
-      req.params.blogPostId,
-      req.body,
-      { new: true, runValidators: true }
-      //if you want to get back the newly updated record, you need to set new: true)
-      //By default validation is off here --> set runValidators:true
-    );
+blogPostsRouter.put(
+  "/:blogPostId",
+  basicAuthentication,
+  async (req, res, next) => {
+    try {
+      const updatedBlogPost = await BlogPostsModel.findByIdAndUpdate(
+        req.params.blogPostId,
+        req.body,
+        { new: true, runValidators: true }
+        //if you want to get back the newly updated record, you need to set new: true)
+        //By default validation is off here --> set runValidators:true
+      );
 
-    if (updatedBlogPost) {
-      res.send(updatedBlogPost);
-    } else {
-      next(NotFound(`Blog post with id ${req.params.blogPostId} not found!`));
+      if (updatedBlogPost) {
+        res.send(updatedBlogPost);
+      } else {
+        next(NotFound(`Blog post with id ${req.params.blogPostId} not found!`));
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 //DELETE http://localhost:3001/blogPosts/:blogPostId
 /* blogPostsRouter.delete("/:blogPostId", (req, res) => {
@@ -150,20 +155,24 @@ blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
 });
  */
 
-blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
-  try {
-    const deletedBlogPost = await BlogPostsModel.findByIdAndDelete(
-      req.params.blogPostId
-    );
-    if (deletedBlogPost) {
-      res.status(204).end();
-    } else {
-      next(NotFound(`Blog post with id ${req.params.blogPostId} not found!`));
+blogPostsRouter.delete(
+  "/:blogPostId",
+  basicAuthentication,
+  async (req, res, next) => {
+    try {
+      const deletedBlogPost = await BlogPostsModel.findByIdAndDelete(
+        req.params.blogPostId
+      );
+      if (deletedBlogPost) {
+        res.status(204).end();
+      } else {
+        next(NotFound(`Blog post with id ${req.params.blogPostId} not found!`));
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 //*********************************************************************************/
 
