@@ -10,6 +10,7 @@ import {
 } from "./errorHandlers.js";
 import filesRouter from "./api/files/index.js";
 import mongoose from "mongoose";
+import meRouter from "./api/me/index.js";
 
 const server = express();
 // server waits for request
@@ -70,6 +71,7 @@ server.use(express.json());
 server.use("/authors", authorsRouter);
 server.use("/blogPosts", blogPostsRouter);
 server.use("/files", filesRouter);
+server.use("/me", meRouter);
 
 // ************************** ERROR HANDLERS ************************
 server.use(notFoundHandler); //404

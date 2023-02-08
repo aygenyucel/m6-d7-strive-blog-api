@@ -32,6 +32,8 @@ const basicAuthentication = async (req, res, next) => {
     console.log("***Author:", author);
 
     if (author) {
+      req.author = author; //adding the current user to the req object is going to unlock a number of possibilites like
+      //using some subsequent middlewares to check the role of the user for instance (Authorization)
       next();
     } else {
       next(createHttpError(401, "Credentials not ok!"));
