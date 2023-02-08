@@ -12,11 +12,7 @@ meRouter.get(
   async (req, res, next) => {
     try {
       const authorId = req.author._id.toString();
-      console.log("jkdshfuekshfjsdf", authorId);
-      const blogPosts = await BlogPostModel.find({
-        authors: { $elemMatch: { authorId } },
-      });
-      console.log("xxxxxxxxxxxx", blogPosts.authors);
+      const blogPosts = await BlogPostModel.find({ authors: authorId });
       res.send(blogPosts);
     } catch (error) {
       next(error);
